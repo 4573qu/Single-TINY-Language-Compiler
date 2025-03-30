@@ -1,0 +1,154 @@
+{
+    "ErrorTokenName": "TK_error",
+    "SkipTokens": [
+        "TK_useless",
+        "TK_comment"
+    ],
+    "Tokens": [
+        {
+            "syntax": "\\[ \\n\\r\\t\\]\\+",
+            "token": "TK_useless"
+        },
+        {
+            "syntax": "int",
+            "token": "TK_int"
+        },
+        {
+            "syntax": "float",
+            "token": "TK_float"
+        },
+        {
+            "syntax": "char",
+            "token": "TK_char"
+        },
+        {
+            "syntax": "array",
+            "token": "TK_array"
+        },
+        {
+            "syntax": "||",
+            "token": "TK_logical_or"
+        },
+        {
+            "syntax": "&&",
+            "token": "TK_logical_and"
+        },
+        {
+            "syntax": "=",
+            "token": "TK_assign"
+        },
+        {
+            "syntax": "==",
+            "token": "TK_logical_equal"
+        },
+        {
+            "syntax": "<",
+            "token": "TK_left_angle"
+        },
+        {
+            "syntax": "+",
+            "token": "TK_add"
+        },
+        {
+            "syntax": "+=",
+            "token": "TK_add_assign"
+        },
+        {
+            "syntax": "-",
+            "token": "TK_minus"
+        },
+        {
+            "syntax": "*",
+            "token": "TK_star"
+        },
+        {
+            "syntax": "/",
+            "token": "TK_div"
+        },
+        {
+            "syntax": "(",
+            "token": "TK_left_paren"
+        },
+        {
+            "syntax": ")",
+            "token": "TK_right_paren"
+        },
+        {
+            "syntax": ";",
+            "token": "TK_semicolon"
+        },
+        {
+            "syntax": "if",
+            "token": "TK_if"
+        },
+        {
+            "syntax": "then",
+            "token": "TK_then"
+        },
+        {
+            "syntax": "else",
+            "token": "TK_else"
+        },
+        {
+            "syntax": "end",
+            "token": "TK_end"
+        },
+        {
+            "syntax": "repeat",
+            "token": "TK_repeat"
+        },
+        {
+            "syntax": "until",
+            "token": "TK_until"
+        },
+        {
+            "syntax": "read",
+            "token": "TK_read"
+        },
+        {
+            "syntax": "write",
+            "token": "TK_write"
+        },
+        {
+            "syntax": "define",
+            "token": "TK_define"
+        },
+        {
+            "syntax": "//\\[\\t \\-~\\^\\n\\^\\r\\]\\*\\n",
+            "token": "TK_comment"
+        },
+        {
+            "syntax": "/*\\[\\t\\n\\r \\-~\\]\\**/",
+            "token": "TK_comment"
+        },
+        {
+            "syntax": "\\[a\\-zA\\-Z_\\]\\[a\\-zA\\-Z0\\-9_\\]\\*",
+            "token": "TK_id"
+        },
+        {
+            "syntax": "\"\\(\\[ \\-~\\t\\^\"\\^\\\\\\]\\*\\(\\\\\\[ \\-~\\t\\]\\)\\*\\)\\*\"",
+            "token": "TK_string_literal"
+        },
+        {
+            "syntax": "'\\[ \\-~\\^\\\\\\^'\\]'",
+            "token": "TK_char_literal"
+        },
+        {
+            "syntax": "'\\\\\\[a\\-zA\\-Z\"'\\\\\\]'",
+            "token": "TK_char_literal"
+        },
+        {
+            "syntax": "\\(\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\)\\?.\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\(\\[eE\\]\\[+-\\]\\?\\(\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\)\\?\\)\\?\\[flFL\\]\\?",
+            "token": "TK_float_literal"
+        },
+        {
+            "syntax": "\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*.\\(\\[eE\\]\\[+-\\]\\?\\(\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\)\\?\\)\\?\\[flFL\\]\\?",
+            "token": "TK_float_literal"
+        },
+        {
+            "syntax": "\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\[eE\\]\\[+-\\]\\?\\(\\[0\\-9\\]\\('\\?\\[0\\-9\\]\\)\\*\\)\\?\\[flFL\\]\\?",
+            "token": "TK_float_literal"
+        }
+    ],
+    "UselessTokenName": "TK_useless"
+}

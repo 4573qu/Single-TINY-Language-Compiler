@@ -1,0 +1,424 @@
+{
+    "End_Syntaxes": [
+        "UPDATEALL Vars VALUE level=level+1 WHERE is_temp=false",
+        "SELECTALL FROM Current_Vars INTO AVars:",
+        "FOREACH AVar IN AVars:",
+        " INSERT INTO Vars VALUE [AVar].string,[AVar].level,[AVar].type_name,[AVar].type_length,[AVar].type_array_length,[AVar].is_temp",
+        "CLEAR Current_Vars"
+    ],
+    "Initializations": [
+        {
+            "parameters": [
+                "int",
+                "float",
+                0,
+                "assign_int_float_literal"
+            ],
+            "table": "Assign_Func",
+            "type": "INSERT"
+        },
+        {
+            "parameters": [
+                "+",
+                "int",
+                4,
+                "int",
+                "int",
+                true,
+                false,
+                "add_int_int_literal"
+            ],
+            "table": "Calc_Func",
+            "type": "INSERT"
+        },
+        {
+            "type": "INSERT",
+            "parameters": [
+                "<",
+                "bool",
+                1,
+                "int",
+                "float",
+                true,
+                false,
+                "less_int_float_literal"
+            ],
+            "table": "Calc_Func"
+        },
+        {
+            "parameters": [
+                "bool",
+                "if_start_bool",
+                false
+            ],
+            "table": "Get_Func",
+            "type": "INSERT"
+        }
+    ],
+    "Mid_Funcs": {
+        "assign_int_float_literal": [
+            "get_float_literal (S2)",
+            "assign_float_to_int (S1)"
+        ],
+        "add_int_int_literal": [
+            "get_int (S1)",
+            "add_int_int (S2)",
+            "set_int (S3)"
+        ],
+         "less_int_float_literal": [
+            "get_int (S1)",
+            "convert_int_to_float",
+            "get_float_literal (S2)",
+            "compare_floats",
+            "set_bool (S3)"
+        ],
+        "if_start_bool": [
+            "get_bool (S1)",
+            "test_bool",
+            "jnequalthen",
+            "jumpnext (S2)"
+        ],
+        "if_end": [
+            "label_0 (S1)"
+        ]
+    },
+    "Operators": {
+        "ADD": "TK_add",
+        "ADDASSIGN": "TK_add_assign",
+        "AND": "TK_logical_and",
+        "ARRAY": "TK_array",
+        "ASSIGN": "TK_assign",
+        "CHAR": "TK_char",
+        "DEFINE": "TK_define",
+        "ELSE": "TK_else",
+        "END": "TK_end",
+        "EQ": "TK_logical_equal",
+        "FLOAT": "TK_float",
+        "ID": "TK_id",
+        "IF": "TK_if",
+        "INT": "TK_int",
+        "LETTER": "TK_char_literal",
+        "LPAREN": "TK_left_paren",
+        "LT": "TK_left_angle",
+        "MINUS": "TK_minus",
+        "NUM": "TK_number_literal",
+        "OP_EOF": {},
+        "OP_ERROR": {},
+        "OP_S": {},
+        "OP_Seperator": {},
+        "OR": "TK_logical_or",
+        "OVER": "TK_div",
+        "READ": "TK_read",
+        "REAL": "TK_float_literal",
+        "REPEAT": "TK_repeat",
+        "RPAREN": "TK_right_paren",
+        "SEMI": "TK_semicolon",
+        "STRING": "TK_string_literal",
+        "THEN": "TK_then",
+        "TIMES": "TK_star",
+        "UNTIL": "TK_until",
+        "WRITE": "TK_write",
+        "assign_stmt": "",
+        "define_stmt": "",
+        "exp": "",
+        "factor": "",
+        "if_else": "",
+        "if_start": "",
+        "if_stmt": "",
+        "simple_exp": "",
+        "stmt": "",
+        "stmt_seq": "",
+        "term": "",
+        "type": ""
+    },
+    "Parser": {
+        "eof": "OP_EOF",
+        "error": "OP_ERROR",
+        "seperator": "OP_Seperator",
+        "start": "OP_S",
+        "start_syntax": 1
+    },
+    "Syntaxes": [
+        {
+            "LeftOp": "type",
+            "Lines": [
+                "CLEAR Current_Type",
+                "INSERT INTO Current_Type VALUE \"int\",4,1"
+            ],
+            "RightOp": [
+                "INT"
+            ]
+        },
+        {
+            "LeftOp": "define_stmt",
+            "Lines": [
+                "SELECT * FROM Current_Vars WHERE name=\"V\"+{S2}.val AND is_temp=false INTO AVar:",
+                " error \"Line:%s ID(%s) exists!\" {S2}.line [AVar].name",
+                " SELECT * FROM Current_Type INTO AType:",
+                "  INSERT INTO Current_Vars VALUE \"V\"+{S2}.val,0,[AType].name,[AType].length,[AType].array_length,false",
+                " ELSE:",
+                "  error \"Lack Type Info!\""
+            ],
+            "RightOp": [
+                "DEFINE",
+                "ID",
+                "type"
+            ]
+        },
+        {
+            "LeftOp": "factor",
+            "Lines": [
+                "INSERT INTO Current_Exps VALUE {S1}.val,\"int\",false "
+            ],
+            "RightOp": [
+                "NUM"
+            ]
+        },
+        {
+            "LeftOp": "term",
+            "RightOp": [
+                "factor"
+            ]
+        },
+        {
+            "LeftOp": "simple_exp",
+            "RightOp": [
+                "term"
+            ]
+        },
+        {
+            "LeftOp": "exp",
+            "RightOp": [
+                "simple_exp"
+            ]
+        },
+        {
+            "LeftOp": "assign_stmt",
+            "Lines": [
+                "SELECT * FROM Current_Exps WHERE is_id=false INTO AExp:",
+                "SELECT * FROM Current_Exps INTO AExp:",
+                "ELSE:",
+                " error \"Lack Expression!\"",
+                "SELECT * FROM Current_Vars WHERE name={S1}.val INTO AVar:",
+                "SELECT * FROM Vars WHERE name={S1}.val INTO AVar:",
+                "ELSE:",
+                " error \"Id does not exists!\"",
+                "SELECT * FROM Assign_Func WHERE dst_type=[AVar].type_name  AND src_type=[AExp].type AND src_id=[AExp].is_id INTO AFunc:",
+                " MID_FUNC AFunc.to_func [AVar].name AExp.value",
+                " CLEAR Current_Exps",
+                "ELSE:",
+                " error \"Types are not suitable!\""
+            ],
+            "RightOp": [
+                "ID",
+                "assign",
+                "exp"
+            ]
+        },
+        {
+            "LeftOp": "factor",
+            "Lines": [
+                "SELECT * FROM Current_Vars WHERE name={S1}.val INTO AVar:",
+                "SELECT * FROM Vars WHERE name={S1}.val INTO AVar:",
+                "ELSE:",
+                " error \"ID does not exists!\"",
+                "INSERT INTO Current_Exps VALUE [AVar].val,[AVar].type_name,true"
+            ],
+            "RightOp": [
+                "ID"
+            ]
+        },
+        {
+            "LeftOp": "simple_exp",
+            "Lines": [
+                "SELECT * FROM Current_Exps WHERE (ID)=1 INTO AExp_1:",
+                "ELSE:",
+                " error \"Lack operand!\"",
+                "SELECT * FROM Current_Exps WHERE (ID)=2 INTO AExp_2:",
+                "ELSE:",
+                " error \"Lack operand!\"",
+                "SELECT * FROM Calc_Func WHERE calc_type=\"+\" AND src1_type=[AExp_1].type AND src2_type=[AExp_2].type AND src1_id=[AExp_1].is_id AND src2_id=[AExp_2].is_id INTO AFunc:",
+                "ELSE:",
+                " error \"No Suitable Func For Add with %s and %s!\" [AExp_1].type [AExp_2].type",
+                "SELECT * FROM Temp_Vars DESCEND id INTO ATempId:",
+                " INSERT INTO Temp_Vars VALUE [ATempId].id+1",
+                " INSERT INTO Vars VALUE \"v\"+[ATempId].id,0,[AFunc].dst_type,[AFunc].dst_length,1,true",
+                " MIDFUNC AFunc.to_func [AExp_1].name [AExp_2].name \"v\"+[ATempId].id",
+                " CLEAR Current_Exps",
+                " INSERT INTO Current_Exps VALUE \"v\"+[ATempId].id,[AFunc].dst_type,true"
+            ],
+            "RightOp": [
+                "simple_exp",
+                "PLUS",
+                "term"
+            ]
+        },
+        {
+            "LeftOp": "exp",
+            "Lines": [
+                "SELECT * FROM Current_Exps WHERE (ID)=1 INTO AExp_1:",
+                "ELSE:",
+                " error \"Lack operand!\"",
+                "SELECT * FROM Current_Exps WHERE (ID)=2 INTO AExp_2:",
+                "ELSE:",
+                " error \"Lack operand!\"",
+                "SELECT * FROM Calc_Func WHERE calc_type=\"<\" AND src1_type=[AExp_1].type AND src2_type=[AExp_2].type AND src1_id=[AExp_1].is_id AND src2_id=[AExp_2].is_id INTO AFunc:",
+                "ELSE:",
+                " error \"No Suitable Func For Add with %s and %s!\" [AExp_1].type [AExp_2].type",
+                "SELECT * FROM Temp_Vars DESCEND id INTO ATempId:",
+                " INSERT INTO Temp_Vars VALUE [ATempId].id+1",
+                " INSERT INTO Vars VALUE \"v\"+[ATempId].id,0,[AFunc].dst_type,[AFunc].dst_length,1,true",
+                " MIDFUNC AFunc.to_func [AExp_1].name [AExp_2].name \"v\"+[ATempId].id",
+                " CLEAR Current_Exps",
+                " INSERT INTO Current_Exps VALUE \"v\"+[ATempId].id,[AFunc].dst_type,true"
+            ],
+            "RightOp": [
+                "simple_exp",
+                "LT",
+                "simple_exp"
+            ]
+        },
+        {
+            "LeftOp": "if_start",
+            "Lines": [
+                "SELECT * FROM Jumps INTO AJumpId:",
+                " UPDATE AJumpId WHERE id=id+1",
+                " CLEAR Jumps",
+                " INSERT INTO Jumps VALUE [AJumpId].id",
+                " ss \"label%d\" [AJumpId].id",
+                "SELECT * FROM Current_Exps INTO AExp:",
+                "ELSE:",
+                " error \"Lack expression!\"",
+                "SELECT * FROM Get_Func WHERE get_type=[AExp].type AND is_id=[AExp].is_id INTO AFunc:",
+                " MIDFUNC AFunc.to_func [AExp].name [AJumpId].id",
+                " CLEAR Current_Exps",
+                "ELSE:",
+                " error \"No Suitable Func For If Start!\""
+            ],
+            "RightOp": [
+                "IF",
+                "exp",
+                "THEN"
+            ]
+        },
+        {
+            "LeftOp": "if_stmt",
+            "Lines": [
+                "SELECT * FROM Jumps INTO AJumpId:",
+                " MIDFUNC \"if_end\" [AJumpId].id",
+                "UPDATEALL Vars VALUE level=level+1 WHERE is_temp=false",
+                "SELECTALL FROM Current_Vars INTO AVars:",
+                "FOREACH AVar IN AVars:",
+                " INSERT INTO Vars VALUE [AVar].string,[AVar].level,[AVar].type_name,[AVar].type_length,[AVar].type_array_length,[AVar].is_temp",
+                "CLEAR Current_Vars"
+            ],
+            "RightOp": [
+                "if_start",
+                "stmt_seq",
+                "END"
+            ]
+        }
+    ],
+    "Tables": {
+        "Assign_Func": {
+            "0-dst_type": "string",
+            "1-src_type": "string",
+            "2-src_id": "bool",
+            "3-to_func": "string"
+        },
+        "Calc_Func": {
+            "0-calc_type": "string",
+            "1-dst_type": "string",
+            "2-dst_length": "int",
+            "3-src1_type": "string",
+            "4-src2_type": "string",
+            "5-src1_id": "bool",
+            "6-src2_id": "bool",
+            "7-to_func": "string"
+        },
+        "Current_Exps": {
+            "0-value": "string",
+            "1-type": "string",
+            "2-is_id": "bool"
+        },
+        "Current_Type": {
+            "0-name": "string",
+            "1-length": "int",
+            "2-array_length": "int"
+        },
+        "Current_Vars": {
+            "0-name": "string",
+            "1-level": "int",
+            "2-type_name": "string",
+            "3-type_length": "int",
+            "4-type_array_length": "int",
+            "5-is_temp": "bool"
+        },
+        "Get_Func": {
+            "0-get_type": "string",
+            "1-to_func": "string",
+            "2-is_id": "bool"
+        },
+        "Jumps": {
+            "0-id": "int"
+        },
+        "Temp_Vars": {
+            "0-id": "int"
+        },
+        "Vars": {
+            "0-name": "string",
+            "1-level": "int",
+            "2-type_name": "string",
+            "3-type_length": "int",
+            "4-type_array_length": "int",
+            "5-is_temp": "bool"
+        }
+    },
+    "Target_Funcs": {
+        "get_float_literal": [
+            "IR \"fld %s\" (S1)"
+        ],
+        "assign_float_to_int": [
+            "IR \"sub exp,4\"",
+            "IR \"fstp [esp]\"",
+            "IR \"mov %s,[esp]\" (S1)",
+            "IR \"add esp,4\""
+        ],
+        "get_int": [
+            "IR \"mov eax,%s\" (S1)"
+        ],
+        "add_int_int": [
+            "IR \"add eax,%s\" (S1)"
+        ],
+        "set_int": [
+            "IR \"mov %s,eax\" (S1)"
+        ],
+        "convert_int_to_float": [
+            "IR \"push eax\"",
+            "IR \"fild [esp]\"",
+            "IR \"add esp,4\""
+        ],
+        "compare_floats": [
+            "IR \"fcomp st(1),st\"",
+            "IR \"fnstsw ax\""
+        ],
+        "set_bool": [
+            "IR \"mov %s,al\" (S1)"
+        ],
+        "get_bool": [
+            "IR \"mov al,%s\" (S1)"
+        ],
+        "test_bool": [
+            "IR \"test al,al\""
+        ],
+        "jnequalthen": [
+            "IR \"jne 2\""
+        ],
+        "jumpnext": [
+            "IR \"jmp %s_0:\" (S1)"
+        ],
+        "label_0": [
+            "IR \"%s_0:\" (S1)"
+        ]
+    }
+}
